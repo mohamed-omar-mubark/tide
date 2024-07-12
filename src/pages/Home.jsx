@@ -2,19 +2,20 @@ import React from "react";
 
 // components
 import Header from "../components/Header";
+import Posts from "../components/Posts";
 
 const Home = () => {
   return (
     <div className="home-layout mx-auto">
       <Header />
 
-      <div className="main container">
+      <main className="main container">
         <aside className="profile bg-green-200">Profile</aside>
 
-        <main className="posts bg-red-200">Posts</main>
+        <Posts />
 
         <aside className="side bg-orange-200">Side</aside>
-      </div>
+      </main>
     </div>
   );
 };
