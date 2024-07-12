@@ -1,19 +1,19 @@
 import React from "react";
 
+// components
+import Header from "../components/Header";
+
 const Home = () => {
   return (
-    <div className="home">
-      <div className="header p-4 bg-white">
-        <div className="container">Header</div>
-      </div>
-      <div className="container layout">
-        <div className="main">
-          <div className="profile bg-green-200">Profile</div>
+    <div className="home-layout mx-auto">
+      <Header />
 
-          <div className="posts bg-red-200">Posts</div>
+      <div className="main container">
+        <aside className="profile bg-green-200">Profile</aside>
 
-          <div className="side bg-orange-200">Side</div>
-        </div>
+        <main className="posts bg-red-200">Posts</main>
+
+        <aside className="side bg-orange-200">Side</aside>
       </div>
     </div>
   );
