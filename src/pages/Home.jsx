@@ -2,7 +2,8 @@ import React from "react";
 
 // components
 import Header from "../components/Header";
-import Posts from "../components/Posts";
+import Posts from "../components/Home/Posts";
+import ProfileSide from "../components/Home/ProfileSide";
 
 const Home = () => {
   return (
@@ -10,7 +11,7 @@ const Home = () => {
       <Header />
 
       <main className="main container">
-        <aside className="profile bg-green-200">Profile</aside>
+        <ProfileSide />
 
         <Posts />
 

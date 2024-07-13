@@ -40,6 +40,12 @@ ul {
   align-items: center;
 }
 
+.flex-start-end {
+  display: flex;
+  justify-content: flex-start;
+  align-items: end;
+}
+
 .flex-end-center {
   display: flex;
   justify-content: flex-end;
