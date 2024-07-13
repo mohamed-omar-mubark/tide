@@ -15,7 +15,7 @@ const Home = () => {
 
         <Posts />
 
-        <aside className="side bg-orange-200">Side</aside>
+        <aside className="side p-3 bg-white border-round-xl">Side</aside>
       </main>
     </div>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 
-const UserInfo = () => {
+const UserInfo = ({ user }) => {
   return (
     <aside className="user-info p-3 bg-white border-round-xl">
       <div
@@ -13,14 +13,27 @@ const UserInfo = () => {
         <div
           className="user-image w-5rem h-5rem bg-no-repeat bg-cover bg-center border-circle border-3 border-white"
           style={{
-            backgroundImage: `url(https://avatars.githubusercontent.com/u/88965473?v=4)`,
+            backgroundImage: `url(${user.image})`,
           }}></div>
         <div className="flex flex-column gap-1 pb-2">
-          <span className="font-semibold text-gray-700">Mohamed Omar</span>
-          <span className="text-sm font-medium text-gray-500">
-            Front-End Engineer
-          </span>
+          <span className="font-semibold text-gray-700">{user.name}</span>
+          <span className="text-sm font-medium text-gray-500">{user.role}</span>
         </div>
+      </div>
+
+      <div className="mt-7 pb-3 flex justify-content-around align-items-center border-bottom-1 border-gray-200">
+        {user.statistics.map((item) => (
+          <div
+            key={item.id}
+            className="flex flex-column align-items-center gap-1">
+            <span className="text-xl font-semibold text-gray-700">
+              {item.count}
+            </span>
+            <span className="text-sm font-semibold text-gray-400">
+              {item.title}
+            </span>
+          </div>
+        ))}
       </div>
     </aside>
   );
