@@ -2,7 +2,7 @@ import React from "react";
 
 const UserInfo = ({ user }) => {
   return (
-    <aside className="user-info p-3 bg-white border-round-xl">
+    <div className="user-info p-3 bg-white border-round-xl">
       <div
         className="profile-cover border-round-xl h-8rem bg-no-repeat bg-cover bg-center"
         style={{
@@ -35,7 +35,7 @@ const UserInfo = ({ user }) => {
           </div>
         ))}
       </div>
-    </aside>
+    </div>
   );
 };
 

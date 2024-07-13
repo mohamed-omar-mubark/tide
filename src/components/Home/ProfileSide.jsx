@@ -28,11 +28,13 @@ const user = {
 
 // components
 import UserInfo from "./UserInfo";
+import UserSkills from "./UserSkills";
 
 const ProfileSide = () => {
   return (
     <aside className="profile-side bg-white border-round-xl">
       <UserInfo user={user} />
+      <UserSkills skills={user.skills} />
     </aside>
   );
 };
