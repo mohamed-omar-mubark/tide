@@ -1,6 +1,7 @@
 import React from "react";
 
 // components
+import Stories from "./Stories";
 import Post from "./Post";
 
 // declarations
@@ -44,6 +45,8 @@ const posts = [
 const Posts = () => {
   return (
     <div className="posts flex flex-column gap-3">
+      <Stories />
+
       {posts.map((post) => (
         <Post key={post.id} post={post} />
       ))}
