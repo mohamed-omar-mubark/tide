@@ -13,7 +13,9 @@ const Header = () => {
         </Link>
 
         <div className="controllers flex gap-2">
-          <Button icon="pi pi-sign-in" label="Login" size="small" />
+          <Link to={"/auth/login"}>
+            <Button icon="pi pi-sign-in" label="Login" size="small" />
+          </Link>
         </div>
       </div>
     </div>
