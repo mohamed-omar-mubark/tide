@@ -44,7 +44,7 @@ const posts = [
 
 const Posts = () => {
   return (
-    <div className="posts flex flex-column gap-3">
+    <div className="posts flex flex-column gap-3 pb-3">
       <Stories />
 
       {posts.map((post) => (
