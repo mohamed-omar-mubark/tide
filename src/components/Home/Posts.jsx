@@ -15,10 +15,6 @@ const Posts = () => {
   useEffect(() => {
     const unSub = onSnapshot(collection(db, "posts"), (snapshot) => {
       setPosts(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })));
-      console.log(
-        "tets",
-        snapshot.docs.map((doc) => doc.data())
-      );
       setLoadingPosts(false); // Finished loading posts
     });
     return () => {

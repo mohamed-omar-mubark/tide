@@ -1,64 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { db } from "../../firebase/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 
 // components
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { Avatar } from "primereact/avatar";
-
-// declarations
-const stories = [
-  {
-    id: 1,
-    user: {
-      id: 1,
-      image: "https://avatars.githubusercontent.com/u/88965473?v=4",
-      name: "Mohamed Omar",
-    },
-    images: [
-      {
-        id: 1,
-        image:
-          "https://images.pexels.com/photos/256450/pexels-photo-256450.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      },
-    ],
-  },
-  {
-    id: 2,
-    user: {
-      id: 2,
-      image:
-        "https://images.pexels.com/photos/2379005/pexels-photo-2379005.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      name: "Belal Said",
-    },
-    images: [
-      {
-        id: 2,
-        image:
-          "https://images.pexels.com/photos/34098/south-africa-hluhluwe-giraffes-pattern.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      },
-    ],
-  },
-  {
-    id: 3,
-    user: {
-      id: 3,
-      image:
-        "https://images.pexels.com/photos/6481906/pexels-photo-6481906.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      name: "Mostafa Amgad",
-    },
-    images: [
-      {
-        id: 3,
-        image:
-          "https://images.pexels.com/photos/1802268/pexels-photo-1802268.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      },
-    ],
-  },
-];
+import { Skeleton } from "primereact/skeleton";
+import { Carousel } from "primereact/carousel";
 
 const Stories = () => {
   const [visible, setVisible] = useState(false);
   const [currentStory, setCurrentStory] = useState(null);
+  const [stories, setStories] = useState([]);
+  const [loadingStories, setLoadingStories] = useState(true);
+
+  // get stories
+  useEffect(() => {
+    const unSub = onSnapshot(collection(db, "stories"), (snapshot) => {
+      setStories(
+        snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() }))
+      );
+      setLoadingStories(false); // Finished loading posts
+    });
+    return () => {
+      unSub();
+    };
+  }, []);
 
   const openStory = (story) => {
     setCurrentStory(story);
@@ -67,12 +35,23 @@ const Stories = () => {
 
   const headerElement = currentStory ? (
     <div className="inline-flex align-items-center justify-content-center gap-2">
-      <Avatar image={currentStory.user.image} shape="circle" />
+      <Avatar image={currentStory.data.author?.image} shape="circle" />
       <span className="font-bold white-space-nowrap">
-        {currentStory.user.name}
+        {currentStory.data.author?.name}
       </span>
     </div>
   ) : null;
+
+  const imageTemplate = (image) => {
+    return (
+      <img
+        src={image}
+        alt=""
+        style={{ width: "100%" }}
+        className="border-round-lg mb-3"
+      />
+    );
+  };
 
   return (
     <>
@@ -83,17 +62,15 @@ const Stories = () => {
         style={{ width: "400px" }}
         onHide={() => setVisible(false)}>
         {currentStory && (
-          <div>
-            {currentStory.images.map((img) => (
-              <img
-                key={img.id}
-                src={img.image}
-                alt=""
-                style={{ width: "100%" }}
-                className="border-round-lg"
-              />
-            ))}
-          </div>
+          <Carousel
+            value={currentStory.data.images}
+            numVisible={1}
+            numScroll={1}
+            className="custom-carousel"
+            circular
+            autoplayInterval={3000}
+            itemTemplate={imageTemplate}
+          />
         )}
       </Dialog>
 
@@ -113,6 +90,14 @@ const Stories = () => {
         </div>
 
         <div className="flex-start-center gap-5">
+          {loadingStories && (
+            <Skeleton shape="circle" size="4rem" className="mr-2"></Skeleton>
+          )}
+
+          {!loadingStories && stories.length === 0 && (
+            <p>No stories available.</p>
+          )}
+
           {stories.map((story) => (
             <div
               key={story.id}
@@ -121,8 +106,13 @@ const Stories = () => {
               style={{ minWidth: "92px" }}>
               <div
                 className="border-3 border-primary bg-no-repeat bg-cover bg-center h-5rem w-5rem border-circle"
-                style={{ backgroundImage: `url(${story.user.image})` }}></div>
-              <span className="text-sm font-medium">{story.user.name}</span>
+                style={{
+                  backgroundImage: `url(${story.data.author?.image})`,
+                }}
+                onClick={() => openStory(story)}></div>
+              <span className="text-sm font-medium">
+                {story.data.author?.name}
+              </span>
             </div>
           ))}
         </div>
