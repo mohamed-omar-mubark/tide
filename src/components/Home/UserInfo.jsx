@@ -1,6 +1,10 @@
 import React from "react";
+import { useAuth } from "../../contexts/authContext";
 
-const UserInfo = ({ user }) => {
+const UserInfo = () => {
+  const { currentUser } = useAuth();
+  console.log("user", currentUser);
+
   return (
     <div className="user-info p-3 bg-white border-round-xl">
       <div
@@ -13,16 +17,23 @@ const UserInfo = ({ user }) => {
         <div
           className="user-image w-5rem h-5rem bg-no-repeat bg-cover bg-center border-circle border-3 border-white"
           style={{
-            backgroundImage: `url(${user.image})`,
+            backgroundImage: `url(${
+              currentUser.photoURL ||
+              "https://static.vecteezy.com/system/resources/previews/024/183/525/non_2x/avatar-of-a-man-portrait-of-a-young-guy-illustration-of-male-character-in-modern-color-style-vector.jpg"
+            })`,
           }}></div>
         <div className="flex flex-column gap-1 pb-2">
-          <span className="font-semibold text-gray-700">{user.name}</span>
-          <span className="text-sm font-medium text-gray-500">{user.role}</span>
+          <span className="font-semibold text-gray-700">
+            {currentUser.displayName}
+          </span>
+          <span className="text-sm font-medium text-gray-500">
+            {currentUser.role || "User"}
+          </span>
         </div>
       </div>
 
       <div className="mt-7 pb-3 flex justify-content-around align-items-center border-bottom-1 border-gray-200">
-        {user.statistics.map((item) => (
+        {/* {user.statistics.map((item) => (
           <div
             key={item.id}
             className="flex flex-column align-items-center gap-1">
@@ -33,7 +44,7 @@ const UserInfo = ({ user }) => {
               {item.title}
             </span>
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
   );
