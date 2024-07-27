@@ -5,7 +5,7 @@ import { AuthProvider } from "../contexts/authContext";
 
 // pages and components imports
 import Home from "./Home";
-import Login from "./auth/Login";
+import SignIn from "./auth/SignIn";
 
 // react router
 import { Route, Routes } from "react-router-dom";
@@ -15,7 +15,7 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/signin" element={<SignIn />} />
       </Routes>
     </AuthProvider>
   );

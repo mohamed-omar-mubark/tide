@@ -26,18 +26,18 @@ const Header = () => {
                 size="small"
                 onClick={() => {
                   doSignOut().then(() => {
-                    navigate("/auth/login");
+                    navigate("/auth/signin");
                   });
                 }}
               />
             </>
           ) : (
             <>
-              <Link to={"/auth/login"}>
-                <Button icon="pi pi-sign-in" label="Login" size="small" />
+              <Link to={"/auth/signin"}>
+                <Button icon="pi pi-sign-in" label="Sign In" size="small" />
               </Link>
-              <Link to={"/auth/register"}>
-                <Button label="Register" size="small" />
+              <Link to={"/auth/signup"}>
+                <Button label="Sign Up" size="small" />
               </Link>
             </>
           )}
