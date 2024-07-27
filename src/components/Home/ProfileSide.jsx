@@ -1,40 +1,27 @@
-import React from "react";
-
-// user
-const user = {
-  id: 1,
-  image: "https://avatars.githubusercontent.com/u/88965473?v=4",
-  name: "Mohamed Omar",
-  role: "Front-End Engineer",
-  statistics: [
-    {
-      id: 1,
-      title: "Followers",
-      count: "12K",
-    },
-    {
-      id: 2,
-      title: "Following",
-      count: "990",
-    },
-    {
-      id: 3,
-      title: "Project",
-      count: "50",
-    },
-  ],
-  skills: ["JavaScript", "TypeScript", "Vue", "Nuxt", "React", "Next"],
-};
+import React, { useEffect, useState } from "react";
+import { getCurrentUserData } from "../../firebase/auth";
 
 // components
 import UserInfo from "./UserInfo";
 import UserSkills from "./UserSkills";
 
 const ProfileSide = () => {
+  const [user, setUser] = useState(null);
+
+  // get current user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await getCurrentUserData();
+      setUser(userData);
+    };
+
+    fetchUserData();
+  }, []);
+
   return (
     <aside className="profile-side bg-white border-round-xl">
       <UserInfo user={user} />
-      <UserSkills skills={user.skills} />
+      <UserSkills skills={user?.skills} />
     </aside>
   );
 };

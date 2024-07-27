@@ -3,7 +3,7 @@ import React from "react";
 // components
 import { Button } from "primereact/button";
 
-const UserSkills = ({ skills }) => {
+const UserSkills = ({ skills = [] }) => {
   return (
     <div className="user-skills p-3 pt-0 bg-white border-round-xl">
       <div className="head flex-between-center">

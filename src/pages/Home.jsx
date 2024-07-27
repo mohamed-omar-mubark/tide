@@ -1,9 +1,11 @@
 import React from "react";
+import { useAuth } from "../contexts/authContext";
 
 // components
 import Header from "../components/Header";
 import Posts from "../components/Home/Posts";
 import ProfileSide from "../components/Home/ProfileSide";
+import NoUser from "../components/Home/NoUser";
 import Friends from "../components/Home/Friends";
 
 // declarition
@@ -50,12 +52,14 @@ const friends = [
 ];
 
 const Home = () => {
+  const { userLoggedIn } = useAuth();
+
   return (
     <div className="home-layout mx-auto">
       <Header />
 
       <main className="main container">
-        <ProfileSide />
+        {userLoggedIn ? <ProfileSide /> : <NoUser />}
 
         <Posts />
 
