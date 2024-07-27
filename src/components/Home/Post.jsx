@@ -53,7 +53,7 @@ const Post = ({ post }) => {
         </div>
 
         <span className="text-sm font-medium text-gray-500">
-          {Date(post.data.time)}
+          {new Date(post.data?.time?.toDate()).toLocaleString()}
         </span>
       </div>
 
