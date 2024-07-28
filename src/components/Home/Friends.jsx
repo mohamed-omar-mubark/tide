@@ -42,7 +42,7 @@ const Friends = () => {
           ))}
 
         {friends.map((friend) => (
-          <div key={friend} className="friend flex-between-center">
+          <div key={friend.id} className="friend flex-between-center">
             <div className="flex-start-center gap-3">
               <div
                 style={{
