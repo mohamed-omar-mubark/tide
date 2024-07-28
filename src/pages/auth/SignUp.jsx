@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 
 import {
-  doSignInWithEmailAndPassword,
+  doCreateUserWithEmailAndPassword,
   doSignInWithGoogle,
 } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
@@ -18,7 +18,8 @@ function SignIn() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSigningIn, setIsSigningIn] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
 
   // functions
 
@@ -26,31 +27,28 @@ function SignIn() {
   const signin = async (e) => {
     e.preventDefault();
 
-    if (!isSigningIn) {
-      setIsSigningIn(true);
-      await doSignInWithEmailAndPassword(email, password)
-        .then(() => {
-          // navigate to home
-          Navigate("/");
-        })
-        .catch(() => {
-          setIsSigningIn(false);
-        });
+    if (!isRegistering) {
+      setIsRegistering(true);
+      await doCreateUserWithEmailAndPassword(email, password).then(() => {
+        // navigate to home
+        Navigate("/");
+      });
+      setIsRegistering(false);
     }
   };
 
   const googleSignIn = (e) => {
     e.preventDefault();
 
-    if (!isSigningIn) {
-      setIsSigningIn(true);
+    if (!isRegistering) {
+      setIsRegistering(true);
       doSignInWithGoogle()
         .then(() => {
           // navigate to home
           Navigate("/");
         })
         .catch(() => {
-          setIsSigningIn(false);
+          setIsRegistering(false);
         });
     }
   };
@@ -60,7 +58,7 @@ function SignIn() {
       {userLoggedIn && <Navigate to={"/"} replace={true} />}
 
       <div className="form-container mx-auto w-full max-w-30rem">
-        <h1 className="page-title mt-0 mb-7">Sign In</h1>
+        <h1 className="page-title mt-0 mb-7">Sign Up</h1>
 
         <form onSubmit={signin}>
           <div className="flex flex-column gap-2 mb-3">
@@ -74,7 +72,7 @@ function SignIn() {
             />
           </div>
 
-          <div className="flex flex-column gap-2 mb-5">
+          <div className="flex flex-column gap-2 mb-3">
             <label htmlFor="password">Password</label>
             <Password
               inputId="password"
@@ -86,19 +84,31 @@ function SignIn() {
             />
           </div>
 
+          <div className="flex flex-column gap-2 mb-5">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <Password
+              inputId="confirmPassword"
+              toggleMask
+              value={confirmPassword}
+              onChange={(e) => {
+                setConfirmPassword(e.target.value);
+              }}
+            />
+          </div>
+
           <Button
             className="w-full mb-3"
-            label={isSigningIn ? "Signing In..." : "Sign In"}
+            label={isRegistering ? "Signing Up..." : "Sign Up"}
             type="submit"
-            disabled={isSigningIn}
+            disabled={isRegistering}
           />
         </form>
 
         <div className="flex-between-center mb-4">
           <Link
-            to={"/auth/signup"}
+            to={"/auth/signin"}
             className="text-sm font-medium text-gray-500 hover:text-gray-900">
-            Create new account
+            Sign In
           </Link>
 
           <Link
@@ -115,10 +125,10 @@ function SignIn() {
         <Button
           className="w-full"
           icon="pi pi-google"
-          label={isSigningIn ? "Signing In..." : "Sign In with Google"}
+          label={isRegistering ? "Signing Up..." : "Sign Up with Google"}
           severity="secondary"
           outlined
-          disabled={isSigningIn}
+          disabled={isRegistering}
           onClick={(e) => {
             googleSignIn(e);
           }}
