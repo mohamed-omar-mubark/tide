@@ -1,10 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import { db } from "../../firebase/firebase";
+import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { useAuth } from "../../contexts/authContext";
 
 // components
 import { Button } from "primereact/button";
 
 const Post = ({ post }) => {
-  console.log(post);
+  const { currentUser } = useAuth();
+  const [likes, setLikes] = useState([]);
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    const unSub = onSnapshot(
+      collection(db, "posts", post.id, "likes"),
+      (snapshot) => {
+        setLikes(snapshot.docs);
+      }
+    );
+    return () => {
+      unSub();
+    };
+  }, [post.id]);
+
+  useEffect(() => {
+    setLiked(likes.findIndex((like) => like.id === currentUser?.uid) !== -1);
+  }, [likes, currentUser?.uid]);
+
+  // functions
+
+  // like post
+  const likePost = async () => {
+    if (liked) {
+      await deleteDoc(doc(db, "posts", post.id, "likes", currentUser.uid));
+    } else {
+      await setDoc(doc(db, "posts", post.id, "likes", currentUser.uid), {
+        userId: currentUser.uid,
+      });
+    }
+  };
+
   return (
     <div className="post p-3 bg-white border-round-xl">
       <div className="post-head mb-3 flex-between-center">
@@ -44,10 +80,11 @@ const Post = ({ post }) => {
         <div className="flex-start-center gap-3">
           <i
             className={`pi pi-heart text-2xl ${
-              post.data.isLiked ? "text-red-500" : "text-gray-500"
-            }`}></i>
+              liked ? "text-red-500" : "text-gray-500"
+            }`}
+            onClick={likePost}></i>
           <span className="font-medium text-gray-700">
-            <span className="font-semibold">{post.data.likes} </span>
+            <span className="font-semibold">{likes.length} </span>
             Likes
           </span>
         </div>
