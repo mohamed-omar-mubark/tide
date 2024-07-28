@@ -102,7 +102,7 @@ const Stories = () => {
             <div
               key={story.id}
               onClick={() => openStory(story)}
-              className="story flex min-w flex-column align-items-center gap-2 cursor-pointer"
+              className="story flex flex-column align-items-center gap-2 cursor-pointer"
               style={{ minWidth: "92px" }}>
               <div
                 className="border-3 border-primary bg-no-repeat bg-cover bg-center h-5rem w-5rem border-circle"
