@@ -7,7 +7,7 @@ import { useAuth } from "../../contexts/authContext";
 import { Button } from "primereact/button";
 import { Skeleton } from "primereact/skeleton";
 
-const Friends = () => {
+const PeopleYouMayKnow = () => {
   const [friends, setFriends] = useState([]);
   const { currentUser } = useAuth();
   const [loadingFriends, setLoadingFriends] = useState(true);
@@ -28,7 +28,9 @@ const Friends = () => {
   return (
     <aside className="friends p-3 bg-white border-round-xl">
       <div className="head mb-5">
-        <span className="text-2xl font-semibold text-gray-700">Friends</span>
+        <span className="text-xl font-semibold text-gray-700">
+          People you may know
+        </span>
       </div>
 
       <div className="flex flex-column gap-5">
@@ -79,4 +81,4 @@ const Friends = () => {
   );
 };
 
-export default Friends;
+export default PeopleYouMayKnow;

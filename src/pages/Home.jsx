@@ -6,13 +6,15 @@ import Header from "../components/Header";
 import Posts from "../components/Home/Posts";
 import ProfileSide from "../components/Home/ProfileSide";
 import NoUser from "../components/Home/NoUser";
-import Friends from "../components/Home/Friends";
+import PeopleYouMayKnow from "../components/Home/PeopleYouMayKnow";
+import AddPost from "../components/Home/AddPost";
 
 const Home = () => {
   const { userLoggedIn } = useAuth();
 
   return (
     <div className="home-layout mx-auto">
+      <AddPost />
       <Header />
 
       <main className="main container">
@@ -20,7 +22,7 @@ const Home = () => {
 
         <Posts />
 
-        <Friends />
+        <PeopleYouMayKnow />
       </main>
     </div>
   );

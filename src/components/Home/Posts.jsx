@@ -43,9 +43,11 @@ const Posts = () => {
         </div>
       )}
 
-      {posts.map((post) => (
-        <Post key={post.id} post={post} />
-      ))}
+      {posts
+        .sort((a, b) => b.data.time - a.data.time)
+        .map((post) => (
+          <Post key={post.id} post={post} />
+        ))}
     </div>
   );
 };

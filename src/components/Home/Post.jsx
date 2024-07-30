@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../../firebase/firebase";
 import { doc, setDoc, deleteDoc } from "firebase/firestore";
@@ -6,11 +6,13 @@ import { useAuth } from "../../contexts/authContext";
 
 // components
 import { Button } from "primereact/button";
+import { Menu } from "primereact/menu";
 
 const Post = ({ post }) => {
   const { currentUser } = useAuth();
   const [likes, setLikes] = useState([]);
   const [liked, setLiked] = useState(false);
+  const postActionsMenu = useRef(null);
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -41,6 +43,22 @@ const Post = ({ post }) => {
     }
   };
 
+  const items = [
+    {
+      label: "Options",
+      items: [
+        {
+          label: "Edit",
+          icon: "pi pi-pencil",
+        },
+        {
+          label: "Delete",
+          icon: "pi pi-trash",
+        },
+      ],
+    },
+  ];
+
   return (
     <div className="post p-3 bg-white border-round-xl">
       <div className="post-head mb-3 flex-between-center">
@@ -62,13 +80,25 @@ const Post = ({ post }) => {
         </div>
 
         {currentUser?.uid === post.data.uid && (
-          <Button
-            icon="pi pi-ellipsis-v"
-            text
-            rounded
-            severity="secondary"
-            size="small"
-          />
+          <>
+            <Button
+              icon="pi pi-ellipsis-v"
+              text
+              rounded
+              severity="secondary"
+              size="small"
+              onClick={(event) => postActionsMenu.current.toggle(event)}
+              aria-controls="popup_post_actions_menu"
+              aria-haspopup
+            />
+
+            <Menu
+              model={items}
+              popup
+              ref={postActionsMenu}
+              id="popup_post_actions_menu"
+            />
+          </>
         )}
       </div>
 
@@ -81,7 +111,7 @@ const Post = ({ post }) => {
       <div className="post-statistics mb-3 flex-between-center px-3">
         <div className="flex-start-center gap-3">
           <i
-            className={`pi pi-heart text-2xl ${
+            className={`pi pi-heart text-2xl cursor-pointer ${
               liked ? "text-red-500" : "text-gray-500"
             }`}
             onClick={likePost}></i>
