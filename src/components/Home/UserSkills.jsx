@@ -18,7 +18,7 @@ const UserSkills = ({ skills = [] }) => {
       </div>
 
       <div className="mt-3 flex flex-wrap align-items-center gap-3">
-        {skills.map((skill) => (
+        {skills?.map((skill) => (
           <div key={skill} className="py-2 px-3 bg-gray-200 border-round-xl">
             <span className="text-sm font-medium text-gray-700">{skill}</span>
           </div>

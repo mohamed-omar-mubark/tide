@@ -13,9 +13,10 @@ import { Password } from "primereact/password";
 import { Button } from "primereact/button";
 import { Divider } from "primereact/divider";
 
-function SignIn() {
+function SignUp() {
   const { userLoggedIn } = useAuth();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -23,13 +24,13 @@ function SignIn() {
 
   // functions
 
-  // signin with email and password
-  const signin = async (e) => {
+  // signup with email and password
+  const signUp = async (e) => {
     e.preventDefault();
 
     if (!isRegistering) {
       setIsRegistering(true);
-      await doCreateUserWithEmailAndPassword(email, password).then(() => {
+      await doCreateUserWithEmailAndPassword(name, email, password).then(() => {
         // navigate to home
         Navigate("/");
       });
@@ -60,7 +61,18 @@ function SignIn() {
       <div className="form-container mx-auto w-full max-w-30rem">
         <h1 className="page-title mt-0 mb-7">Sign Up</h1>
 
-        <form onSubmit={signin}>
+        <form onSubmit={signUp}>
+          <div className="flex flex-column gap-2 mb-3">
+            <label htmlFor="name">Name</label>
+            <InputText
+              id="name"
+              value={name}
+              onChange={(e) => {
+                setName(e.target.value);
+              }}
+            />
+          </div>
+
           <div className="flex flex-column gap-2 mb-3">
             <label htmlFor="email">Email</label>
             <InputText
@@ -138,4 +150,4 @@ function SignIn() {
   );
 }
 
-export default SignIn;
+export default SignUp;

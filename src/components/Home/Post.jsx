@@ -61,13 +61,15 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        <Button
-          icon="pi pi-ellipsis-v"
-          text
-          rounded
-          severity="secondary"
-          size="small"
-        />
+        {currentUser?.uid === post.data.uid && (
+          <Button
+            icon="pi pi-ellipsis-v"
+            text
+            rounded
+            severity="secondary"
+            size="small"
+          />
+        )}
       </div>
 
       <div

@@ -31,7 +31,7 @@ const UserInfo = ({ user }) => {
       </div>
 
       <div className="mt-7 pb-3 flex justify-content-around align-items-center border-bottom-1 border-gray-200">
-        {user?.statistics.map((item) => (
+        {user?.statistics?.map((item) => (
           <div
             key={item.id}
             className="flex flex-column align-items-center gap-1">

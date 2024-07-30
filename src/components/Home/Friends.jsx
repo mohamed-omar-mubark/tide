@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../firebase/firebase";
 import { collection, onSnapshot } from "firebase/firestore";
+import { useAuth } from "../../contexts/authContext";
 
 // components
 import { Button } from "primereact/button";
@@ -8,6 +9,7 @@ import { Skeleton } from "primereact/skeleton";
 
 const Friends = () => {
   const [friends, setFriends] = useState([]);
+  const { currentUser } = useAuth();
   const [loadingFriends, setLoadingFriends] = useState(true);
 
   // get friends
@@ -41,35 +43,37 @@ const Friends = () => {
             </div>
           ))}
 
-        {friends.map((friend) => (
-          <div key={friend.id} className="friend flex-between-center">
-            <div className="flex-start-center gap-3">
-              <div
-                style={{
-                  backgroundImage: `url(${friend.data.image})`,
-                }}
-                alt={friend.data.name}
-                className="w-3rem border-circle w-3rem h-3rem bg-no-repeat bg-cover bg-center"></div>
+        {friends
+          .filter((item) => item.data.uid !== currentUser.uid)
+          .map((friend) => (
+            <div key={friend.id} className="friend flex-between-center">
+              <div className="flex-start-center gap-3">
+                <div
+                  style={{
+                    backgroundImage: `url(${friend.data.image})`,
+                  }}
+                  alt={friend.data.name}
+                  className="w-3rem border-circle w-3rem h-3rem bg-no-repeat bg-cover bg-center"></div>
 
-              <div className="flex flex-column gap-2">
-                <span className="font-semibold text-gray-700">
-                  {friend.data.name}
-                </span>
-                <span className="text-sm font-medium text-gray-500">
-                  {friend.data.role}
-                </span>
+                <div className="flex flex-column gap-2">
+                  <span className="font-semibold text-gray-700">
+                    {friend.data.name}
+                  </span>
+                  <span className="text-sm font-medium text-gray-500">
+                    {friend.data.role}
+                  </span>
+                </div>
               </div>
-            </div>
 
-            <Button
-              icon="pi pi-ellipsis-v"
-              text
-              rounded
-              severity="secondary"
-              size="small"
-            />
-          </div>
-        ))}
+              <Button
+                icon="pi pi-ellipsis-v"
+                text
+                rounded
+                severity="secondary"
+                size="small"
+              />
+            </div>
+          ))}
       </div>
     </aside>
   );

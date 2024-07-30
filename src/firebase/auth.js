@@ -4,11 +4,47 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
+  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 
-export const doCreateUserWithEmailAndPassword = async (email, password) => {
-  return createUserWithEmailAndPassword(auth, email, password);
+export const doCreateUserWithEmailAndPassword = async (
+  name,
+  email,
+  password
+) => {
+  const res = await createUserWithEmailAndPassword(auth, email, password);
+
+  await updateProfile(res.user, {
+    name: name,
+  });
+
+  await setDoc(doc(db, "users", res.user.uid), {
+    uid: res.user.uid,
+    name,
+    createdAt: new Date(),
+    image:
+      "https://static.vecteezy.com/system/resources/previews/024/183/525/non_2x/avatar-of-a-man-portrait-of-a-young-guy-illustration-of-male-character-in-modern-color-style-vector.jpg",
+    role: "User",
+    statistics: [
+      {
+        id: 1,
+        title: "Followers",
+        count: "9K",
+      },
+      {
+        id: 2,
+        title: "Following",
+        count: "87",
+      },
+      {
+        id: 3,
+        title: "Project",
+        count: "12",
+      },
+    ],
+    skills: ["HTML", "CSS", "JavaScript", "TypeScript", "React", "Next"],
+  });
 };
 
 export const doSignInWithEmailAndPassword = (email, password) => {
