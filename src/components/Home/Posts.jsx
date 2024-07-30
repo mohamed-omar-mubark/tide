@@ -43,11 +43,15 @@ const Posts = () => {
         </div>
       )}
 
-      {posts
-        .sort((a, b) => b.data.time - a.data.time)
-        .map((post) => (
-          <Post key={post.id} post={post} />
-        ))}
+      {!posts.length && !loadingPosts ? (
+        <div className="p-3 flex-center bg-white border-round-lg h-6rem">
+          <span>There are no posts at the moment.</span>
+        </div>
+      ) : (
+        posts
+          .sort((a, b) => b.data.time - a.data.time)
+          .map((post) => <Post key={post.id} post={post} setPosts={setPosts} />)
+      )}
     </div>
   );
 };

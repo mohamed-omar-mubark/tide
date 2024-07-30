@@ -8,7 +8,7 @@ import { useAuth } from "../../contexts/authContext";
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
 
-const Post = ({ post }) => {
+const Post = ({ post, setPosts }) => {
   const { currentUser } = useAuth();
   const [likes, setLikes] = useState([]);
   const [liked, setLiked] = useState(false);
@@ -30,19 +30,7 @@ const Post = ({ post }) => {
     setLiked(likes.findIndex((like) => like.id === currentUser?.uid) !== -1);
   }, [likes, currentUser?.uid]);
 
-  // functions
-
-  // like post
-  const likePost = async () => {
-    if (liked) {
-      await deleteDoc(doc(db, "posts", post.id, "likes", currentUser.uid));
-    } else {
-      await setDoc(doc(db, "posts", post.id, "likes", currentUser.uid), {
-        userId: currentUser.uid,
-      });
-    }
-  };
-
+  // declaration
   const items = [
     {
       label: "Options",
@@ -58,6 +46,29 @@ const Post = ({ post }) => {
       ],
     },
   ];
+
+  // functions
+
+  // like post
+  const likePost = async () => {
+    if (liked) {
+      await deleteDoc(doc(db, "posts", post.id, "likes", currentUser.uid));
+    } else {
+      await setDoc(doc(db, "posts", post.id, "likes", currentUser.uid), {
+        userId: currentUser.uid,
+      });
+    }
+  };
+
+  // delete post
+  const handleDelete = async (postId) => {
+    try {
+      await deleteDoc(doc(db, "posts", postId));
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="post p-3 bg-white border-round-xl">
@@ -81,6 +92,14 @@ const Post = ({ post }) => {
 
         {currentUser?.uid === post.data.uid && (
           <>
+            <Button
+              icon="pi pi-trash"
+              text
+              rounded
+              severity="danger"
+              size="small"
+              onClick={() => handleDelete(post.id)}
+            />
             <Button
               icon="pi pi-ellipsis-v"
               text
