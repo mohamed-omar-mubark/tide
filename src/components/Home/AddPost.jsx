@@ -1,34 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "../../contexts/authContext";
-import { v4 as uuid } from "uuid";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/firebase";
-import {
-  addDoc,
-  arrayUnion,
-  collection,
-  serverTimestamp,
-  Timestamp,
-  updateDoc,
-  doc,
-} from "firebase/firestore";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 
 // components
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
+import { InputTextarea } from "primereact/inputtextarea";
+import { FileUpload } from "primereact/fileupload";
 
-const AddPost = () => {
+const AddPost = ({ setPosts }) => {
   const { currentUser } = useAuth();
+
   const [postTitle, setPostTitle] = useState("");
-  const [img, setImg] = useState(null);
+  const [postDescription, setPostDescription] = useState("");
+  const [img, setPostImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [visible, setVisible] = useState(false);
+  const [postDialogVisible, setPostDialogVisible] = useState(false);
+  const fileUploadRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
-    if (!currentUser) return;
+    let imageURL = "";
+
+    if (img) {
+      const imageRef = ref(storage, `postImages/${Date.now()}_${img.name}`);
+      try {
+        await uploadBytes(imageRef, img);
+        imageURL = await getDownloadURL(imageRef);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
 
     const postData = {
       uid: currentUser.uid,
@@ -39,104 +46,109 @@ const AddPost = () => {
         image: currentUser.photoURL,
         role: "User",
       },
-      image:
-        "https://images.pexels.com/photos/15812624/pexels-photo-15812624/free-photo-of-woman-posing-on-stadium.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1",
-      title: "Post Title",
-      description: "Post description",
+      title: postTitle,
+      description: postDescription,
+      image: imageURL,
       time: serverTimestamp(),
     };
 
-    const postDocRef = await addDoc(collection(db, "posts"), postData);
-
-    if (img) {
-      const storageRef = ref(storage, `Posts/${uuid()}`);
-      const uploadTask = uploadBytesResumable(storageRef, img);
-
-      setIsLoading(true);
-
-      uploadTask.on(
-        "state_changed",
-        null,
-        (error) => {
-          console.error("Upload failed", error);
-          setIsLoading(false); // Stop loading if there's an error
-        },
-        async () => {
-          try {
-            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-
-            await updateDoc(postDocRef, { img: downloadURL });
-
-            await updateDoc(doc(db, "users", currentUser.uid), {
-              posts: arrayUnion({
-                ...postData,
-                id: postDocRef.id,
-                img: downloadURL,
-                time: Timestamp.now(),
-              }),
-            });
-
-            setImg(null);
-            setIsLoading(false); // Stop loading when done
-          } catch (error) {
-            console.error("Error fetching download URL", error);
-            setIsLoading(false); // Stop loading if there's an error
-          }
-        }
-      );
-    } else {
-      await updateDoc(postDocRef, { img: null });
-
-      await updateDoc(doc(db, "users", currentUser.uid), {
-        posts: arrayUnion({
-          ...postData,
-          id: postDocRef.id,
-          img: null,
-          time: Timestamp.now(),
-        }),
-      });
-      setImg(null);
+    try {
+      const docRef = await addDoc(collection(db, "posts"), postData);
+      setPosts((prevPosts) => [{ ...postData, id: docRef.id }, ...prevPosts]);
+      setPostTitle("");
+      setPostDescription("");
+      setPostImage(null);
+      fileUploadRef.current.clear();
+      setPostDialogVisible(false);
+    } catch (error) {
+      console.error("Error adding post:", error);
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  const headerTemplate = (options) => {
+    const { className, chooseButton, cancelButton } = options;
+
+    return (
+      <div
+        className={className}
+        style={{
+          backgroundColor: "transparent",
+          display: "flex",
+          alignItems: "center",
+        }}>
+        {chooseButton}
+        {cancelButton}
+      </div>
+    );
+  };
+
+  const itemTemplate = (file) => {
+    return (
+      <img
+        alt={file.name}
+        role="presentation"
+        src={file.objectURL}
+        width={200}
+      />
+    );
   };
 
   return (
     <>
       <Dialog
         header="Add Post"
-        visible={visible}
+        visible={postDialogVisible}
         style={{ width: "100%", maxWidth: "500px" }}
-        onHide={() => {
-          if (!visible) return;
-          setVisible(false);
-        }}>
+        onHide={() => setPostDialogVisible(false)}>
         <form onSubmit={handleSubmit}>
-          <div className="flex flex-column gap-2 mb-5">
+          <div className="flex flex-column gap-2 mb-3">
             <label htmlFor="post-title">Post Title</label>
             <InputText
               id="post-title"
               value={postTitle}
-              onChange={(e) => {
-                setPostTitle(e.target.value);
-              }}
+              onChange={(e) => setPostTitle(e.target.value)}
             />
           </div>
 
           <div className="flex flex-column gap-2 mb-5">
-            <label htmlFor="post-title">Post Content</label>
-            <InputText
-              id="post-title"
-              value={postTitle}
-              onChange={(e) => {
-                setPostTitle(e.target.value);
+            <label htmlFor="post-paragraph">Post Paragraph</label>
+            <InputTextarea
+              id="post-paragraph"
+              value={postDescription}
+              onChange={(e) => setPostDescription(e.target.value)}
+              rows={3}
+            />
+          </div>
+
+          <div className="flex flex-column gap-2 mb-5">
+            <label>Post Image</label>
+            <FileUpload
+              ref={fileUploadRef}
+              headerTemplate={headerTemplate}
+              itemTemplate={itemTemplate}
+              name="demo[]"
+              accept="image/*"
+              maxFileSize={1000000}
+              emptyTemplate={<p className="m-0">Drag and drop image here.</p>}
+              onSelect={(e) => {
+                setPostImage(e.files[0]);
               }}
             />
           </div>
 
           <div className="flex justify-content-end align-items-center gap-3">
-            <Button label="Cancel" type="submit" disabled={isLoading} />
+            <Button
+              label="Cancel"
+              type="button"
+              size="small"
+              onClick={() => setPostDialogVisible(false)}
+            />
             <Button
               label={isLoading ? "loading..." : "Add"}
               type="submit"
+              size="small"
               disabled={isLoading}
             />
           </div>
@@ -151,7 +163,7 @@ const AddPost = () => {
           style={{ bottom: "16px", right: "16px" }}
           tooltip="Add New Post"
           tooltipOptions={{ position: "left", className: "text-sm" }}
-          onClick={() => setVisible(true)}
+          onClick={() => setPostDialogVisible(true)}
         />
       )}
     </>

@@ -3,7 +3,7 @@ import { useAuth } from "../../contexts/authContext";
 
 const UserInfo = ({ user }) => {
   const { currentUser } = useAuth();
-  console.log("user", currentUser);
+  console.log("ccccUser", currentUser);
 
   return (
     <div className="user-info p-3 bg-white border-round-xl">

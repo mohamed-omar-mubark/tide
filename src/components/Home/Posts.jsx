@@ -5,6 +5,7 @@ import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 // components
 import Stories from "./Stories";
 import Post from "./Post";
+import AddPost from "./AddPost"; // Import AddPost component
 import { Skeleton } from "primereact/skeleton";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
@@ -50,6 +51,7 @@ const Posts = () => {
   return (
     <div className="posts flex flex-column gap-3 pb-3">
       <Stories />
+      <AddPost setPosts={setPosts} /> {/* Pass setPosts to AddPost */}
       {loadingPosts && (
         <div className="p-3 surface-card border-round-xl">
           <div className="flex mb-3">
@@ -67,9 +69,7 @@ const Posts = () => {
           </div>
         </div>
       )}
-
       <ConfirmDialog />
-
       {!posts.length && !loadingPosts ? (
         <div className="p-3 flex-center bg-white border-round-lg h-6rem">
           <span>There are no posts at the moment.</span>
