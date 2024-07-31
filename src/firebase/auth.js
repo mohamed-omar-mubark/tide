@@ -11,6 +11,7 @@ import { doc, setDoc, getDoc } from "firebase/firestore";
 export const doCreateUserWithEmailAndPassword = async (
   name,
   email,
+  jobTitle,
   password
 ) => {
   const res = await createUserWithEmailAndPassword(auth, email, password);
@@ -25,7 +26,7 @@ export const doCreateUserWithEmailAndPassword = async (
     createdAt: new Date(),
     image:
       "https://static.vecteezy.com/system/resources/previews/024/183/525/non_2x/avatar-of-a-man-portrait-of-a-young-guy-illustration-of-male-character-in-modern-color-style-vector.jpg",
-    role: "User",
+    role: jobTitle,
     statistics: [
       {
         id: 1,
@@ -63,7 +64,7 @@ export const doSignInWithGoogle = async () => {
       name: user.displayName,
       createdAt: new Date(),
       image: user.photoURL,
-      role: "Front-End Engineer",
+      role: "User",
       statistics: [
         {
           id: 1,

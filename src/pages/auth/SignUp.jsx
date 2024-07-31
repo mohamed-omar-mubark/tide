@@ -18,6 +18,7 @@ function SignUp() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -30,7 +31,12 @@ function SignUp() {
 
     if (!isRegistering) {
       setIsRegistering(true);
-      await doCreateUserWithEmailAndPassword(name, email, password).then(() => {
+      await doCreateUserWithEmailAndPassword(
+        name,
+        email,
+        jobTitle,
+        password
+      ).then(() => {
         // navigate to home
         Navigate("/");
       });
@@ -80,6 +86,17 @@ function SignUp() {
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
+              }}
+            />
+          </div>
+
+          <div className="flex flex-column gap-2 mb-3">
+            <label htmlFor="job">Job Title</label>
+            <InputText
+              id="job"
+              value={jobTitle}
+              onChange={(e) => {
+                setJobTitle(e.target.value);
               }}
             />
           </div>
