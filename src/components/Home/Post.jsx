@@ -7,6 +7,7 @@ import { useAuth } from "../../contexts/authContext";
 // components
 import { Button } from "primereact/button";
 import { Menu } from "primereact/menu";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 const Post = ({ post, setPosts }) => {
   const { currentUser } = useAuth();
@@ -42,6 +43,9 @@ const Post = ({ post, setPosts }) => {
         {
           label: "Delete",
           icon: "pi pi-trash",
+          command: () => {
+            deleteConfirm();
+          },
         },
       ],
     },
@@ -58,6 +62,20 @@ const Post = ({ post, setPosts }) => {
         userId: currentUser.uid,
       });
     }
+  };
+
+  // delete confirmation
+  const deleteConfirm = () => {
+    confirmDialog({
+      message: "Do you want to delete this post?",
+      header: "Delete Confirmation",
+      icon: "pi pi-info-circle",
+      acceptClassName: "p-button-danger",
+      defaultFocus: "reject",
+      accept: () => {
+        handleDelete(post.id);
+      },
+    });
   };
 
   // delete post
@@ -92,14 +110,7 @@ const Post = ({ post, setPosts }) => {
 
         {currentUser?.uid === post.data.uid && (
           <>
-            <Button
-              icon="pi pi-trash"
-              text
-              rounded
-              severity="danger"
-              size="small"
-              onClick={() => handleDelete(post.id)}
-            />
+            <ConfirmDialog />
             <Button
               icon="pi pi-ellipsis-v"
               text
