@@ -22,7 +22,7 @@ const UserInfo = ({ user }) => {
               "https://static.vecteezy.com/system/resources/previews/024/183/525/non_2x/avatar-of-a-man-portrait-of-a-young-guy-illustration-of-male-character-in-modern-color-style-vector.jpg"
             })`,
           }}></div>
-        <div className="flex flex-column gap-1 pb-2">
+        <div className="flex flex-column gap-2 pb-1">
           <span className="font-semibold text-gray-700">{user?.name}</span>
           <span className="text-sm font-medium text-gray-500">
             {user?.role}

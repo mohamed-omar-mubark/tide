@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../contexts/authContext";
 import { v4 as uuid } from "uuid";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -112,9 +112,11 @@ const AddPost = () => {
   };
 
   return (
-    <div className="absolute p-3 bg-red-100 bottom-0 right-0">
-      <Button label="Add Post" onClick={handleSubmit} />
-    </div>
+    currentUser && (
+      <div className="absolute p-3 bg-red-100 bottom-0 right-0">
+        <Button label="Add Post" onClick={handleSubmit} />
+      </div>
+    )
   );
 };
 
