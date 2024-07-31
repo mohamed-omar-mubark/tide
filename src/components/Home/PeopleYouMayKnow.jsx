@@ -51,7 +51,7 @@ const PeopleYouMayKnow = () => {
           </div>
         ) : (
           friends
-            .filter((item) => item.data.uid !== currentUser?.uid)
+            .filter((item) => item.id !== currentUser?.uid)
             .map((friend) => (
               <div key={friend.id} className="friend flex-between-center">
                 <div className="flex-start-center gap-3">

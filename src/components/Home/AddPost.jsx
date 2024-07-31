@@ -15,27 +15,20 @@ import {
 
 // components
 import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
 
 const AddPost = () => {
-  const [isPopupVisible, setIsPopupVisible] = useState(false);
-  const [hasTag, setHasTag] = useState("");
-  const [description, setDescription] = useState("");
+  const { currentUser } = useAuth();
+  const [postTitle, setPostTitle] = useState("");
   const [img, setImg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { currentUser } = useAuth();
+  const [visible, setVisible] = useState(false);
 
-  const handleInputClick = () => setIsPopupVisible(true);
-  const handleClosePopup = () => setIsPopupVisible(false);
-  const handleFileChange = (e) => setImg(e.target.files[0]);
-  const handleHasTagChange = (e) => setHasTag(e.target.value);
-  const handleDescriptionChange = (e) => setDescription(e.target.value);
-
-  const handleSubmit = async (/*e*/) => {
-    // e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
     if (!currentUser) return;
-
-    setIsPopupVisible(false);
 
     const postData = {
       uid: currentUser.uid,
@@ -83,8 +76,6 @@ const AddPost = () => {
               }),
             });
 
-            setDescription("");
-            setHasTag("");
             setImg(null);
             setIsLoading(false); // Stop loading when done
           } catch (error) {
@@ -104,19 +95,66 @@ const AddPost = () => {
           time: Timestamp.now(),
         }),
       });
-
-      setDescription("");
-      setHasTag("");
       setImg(null);
     }
   };
 
   return (
-    currentUser && (
-      <div className="absolute p-3 bg-red-100 bottom-0 right-0">
-        <Button label="Add Post" onClick={handleSubmit} />
-      </div>
-    )
+    <>
+      <Dialog
+        header="Add Post"
+        visible={visible}
+        style={{ width: "100%", maxWidth: "500px" }}
+        onHide={() => {
+          if (!visible) return;
+          setVisible(false);
+        }}>
+        <form onSubmit={handleSubmit}>
+          <div className="flex flex-column gap-2 mb-5">
+            <label htmlFor="post-title">Post Title</label>
+            <InputText
+              id="post-title"
+              value={postTitle}
+              onChange={(e) => {
+                setPostTitle(e.target.value);
+              }}
+            />
+          </div>
+
+          <div className="flex flex-column gap-2 mb-5">
+            <label htmlFor="post-title">Post Content</label>
+            <InputText
+              id="post-title"
+              value={postTitle}
+              onChange={(e) => {
+                setPostTitle(e.target.value);
+              }}
+            />
+          </div>
+
+          <div className="flex justify-content-end align-items-center gap-3">
+            <Button label="Cancel" type="submit" disabled={isLoading} />
+            <Button
+              label={isLoading ? "loading..." : "Add"}
+              type="submit"
+              disabled={isLoading}
+            />
+          </div>
+        </form>
+      </Dialog>
+
+      {currentUser && (
+        <Button
+          icon="pi pi-plus"
+          rounded
+          className="fixed"
+          style={{ bottom: "16px", right: "16px" }}
+          tooltip="Add New Post"
+          tooltipOptions={{ position: "left", className: "text-sm" }}
+          onClick={() => setVisible(true)}
+        />
+      )}
+    </>
   );
 };
 

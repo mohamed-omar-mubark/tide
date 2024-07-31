@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../../firebase/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 
 // components
 import Stories from "./Stories";
 import Post from "./Post";
 import { Skeleton } from "primereact/skeleton";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 const Posts = () => {
   const [posts, setPosts] = useState([]);
@@ -21,6 +22,30 @@ const Posts = () => {
       unSub();
     };
   }, []);
+
+  // functions
+
+  const showDeleteConfirmDialog = (postId) => {
+    confirmDialog({
+      message: "Do you want to delete this post?",
+      header: "Delete Confirmation",
+      icon: "pi pi-info-circle",
+      acceptClassName: "p-button-danger",
+      defaultFocus: "reject",
+      accept: () => {
+        handleDelete(postId);
+      },
+    });
+  };
+
+  const handleDelete = async (postId) => {
+    try {
+      await deleteDoc(doc(db, "posts", postId));
+      setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div className="posts flex flex-column gap-3 pb-3">
@@ -43,6 +68,8 @@ const Posts = () => {
         </div>
       )}
 
+      <ConfirmDialog />
+
       {!posts.length && !loadingPosts ? (
         <div className="p-3 flex-center bg-white border-round-lg h-6rem">
           <span>There are no posts at the moment.</span>
@@ -50,7 +77,14 @@ const Posts = () => {
       ) : (
         posts
           .sort((a, b) => b.data.time - a.data.time)
-          .map((post) => <Post key={post.id} post={post} setPosts={setPosts} />)
+          .map((post) => (
+            <Post
+              key={post.id}
+              post={post}
+              setPosts={setPosts}
+              showDeleteConfirmDialog={showDeleteConfirmDialog}
+            />
+          ))
       )}
     </div>
   );
