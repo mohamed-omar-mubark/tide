@@ -16,6 +16,13 @@ body {
   margin: 0 auto !important;
 }
 
+.sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 5px 10px 0 rgba(14, 17, 51, .1);
+}
+
 a {
   text-decoration: none;
   transition: 0.2s;

@@ -17,7 +17,7 @@ const Home = () => {
       <AddPost />
       <Header />
 
-      <main className="main container">
+      <main className="main container pb-3">
         {userLoggedIn ? <ProfileSide /> : <NoUser />}
 
         <Posts />

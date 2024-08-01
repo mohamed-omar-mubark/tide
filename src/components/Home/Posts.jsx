@@ -59,7 +59,7 @@ const Posts = () => {
   };
 
   return (
-    <div className="posts flex flex-column gap-3 pb-3">
+    <div className="posts flex flex-column gap-3">
       <Stories />
       <AddPost setPosts={setPosts} /> {/* Pass setPosts to AddPost */}
       {loadingPosts && (

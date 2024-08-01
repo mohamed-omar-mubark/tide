@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/authContext";
 import { doSignOut } from "../firebase/auth";
@@ -9,9 +9,28 @@ import { Button } from "primereact/button";
 const Header = () => {
   const navigate = useNavigate();
   const { userLoggedIn } = useAuth();
+  const [isSticky, setIsSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 0) {
+        setIsSticky(true);
+      } else {
+        setIsSticky(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
 
   return (
-    <div className="header bg-white flex align-items-center">
+    <div
+      className={`header bg-white flex align-items-center ${
+        isSticky ? "sticky-header" : ""
+      }`}>
       <div className="container flex-between-center">
         <Link to={"/"} className="logo text-4xl font-bold text-primary">
           Tide
