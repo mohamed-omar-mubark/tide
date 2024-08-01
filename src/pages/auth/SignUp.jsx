@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 
-import {
-  doCreateUserWithEmailAndPassword,
-  doSignInWithGoogle,
-} from "../../firebase/auth";
+import { doCreateUserWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 
 // components
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
-import { Divider } from "primereact/divider";
 
 function SignUp() {
   const { userLoggedIn } = useAuth();
@@ -32,31 +28,15 @@ function SignUp() {
     if (!isRegistering) {
       setIsRegistering(true);
       await doCreateUserWithEmailAndPassword(
-        name,
         email,
-        jobTitle,
-        password
+        password,
+        name,
+        jobTitle
       ).then(() => {
         // navigate to home
         Navigate("/");
       });
       setIsRegistering(false);
-    }
-  };
-
-  const googleSignIn = (e) => {
-    e.preventDefault();
-
-    if (!isRegistering) {
-      setIsRegistering(true);
-      doSignInWithGoogle()
-        .then(() => {
-          // navigate to home
-          Navigate("/");
-        })
-        .catch(() => {
-          setIsRegistering(false);
-        });
     }
   };
 
@@ -146,22 +126,6 @@ function SignUp() {
             Back To Home
           </Link>
         </div>
-
-        <Divider align="center" className="mt-0 mb-5">
-          <p className="my-0">OR</p>
-        </Divider>
-
-        <Button
-          className="w-full"
-          icon="pi pi-google"
-          label={isRegistering ? "Signing Up..." : "Sign Up with Google"}
-          severity="secondary"
-          outlined
-          disabled={isRegistering}
-          onClick={(e) => {
-            googleSignIn(e);
-          }}
-        />
       </div>
     </div>
   );

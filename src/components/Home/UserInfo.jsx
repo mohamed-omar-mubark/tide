@@ -1,9 +1,25 @@
-import React from "react";
-import { useAuth } from "../../contexts/authContext";
+import React, { useEffect, useState } from "react";
+import { getCurrentUserData } from "../../firebase/auth";
 
 const UserInfo = ({ user }) => {
-  const { currentUser } = useAuth();
-  console.log("ccccUser", currentUser);
+  const [cUser, setUser] = useState(null);
+
+  // Get current user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await getCurrentUserData();
+      setUser(userData);
+    };
+
+    fetchUserData();
+  }, []); // Empty dependency array ensures this runs only once after the initial render
+
+  // Watch cUser changes
+  useEffect(() => {
+    if (cUser) {
+      // console.log("Current user data:", cUser);
+    }
+  }, [cUser]); // This effect runs whenever cUser changes
 
   return (
     <div className="user-info p-3 bg-white border-round-xl">
@@ -18,7 +34,7 @@ const UserInfo = ({ user }) => {
           className="user-image w-5rem h-5rem bg-no-repeat bg-cover bg-center border-circle border-3 border-white"
           style={{
             backgroundImage: `url(${
-              currentUser?.photoURL ||
+              cUser?.image ||
               "https://static.vecteezy.com/system/resources/previews/024/183/525/non_2x/avatar-of-a-man-portrait-of-a-young-guy-illustration-of-male-character-in-modern-color-style-vector.jpg"
             })`,
           }}></div>

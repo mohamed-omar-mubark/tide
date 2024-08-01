@@ -5,7 +5,7 @@ import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
 // components
 import Stories from "./Stories";
 import Post from "./Post";
-import AddPost from "./AddPost"; // Import AddPost component
+import AddPost from "./AddPost";
 import { Skeleton } from "primereact/skeleton";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
@@ -13,10 +13,20 @@ const Posts = () => {
   const [posts, setPosts] = useState([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
 
-  // get posts
+  // Get posts
   useEffect(() => {
     const unSub = onSnapshot(collection(db, "posts"), (snapshot) => {
-      setPosts(snapshot.docs.map((doc) => ({ id: doc.id, data: doc.data() })));
+      const fetchedPosts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        data: doc.data(),
+      }));
+      const sortedPosts = fetchedPosts.sort(
+        (a, b) => b.data.timestamp - a.data.timestamp
+      ); // Sort posts by timestamp
+
+      console.log("Fetched Posts:", sortedPosts); // Log posts to debug
+
+      setPosts(sortedPosts);
       setLoadingPosts(false); // Finished loading posts
     });
     return () => {
@@ -24,7 +34,7 @@ const Posts = () => {
     };
   }, []);
 
-  // functions
+  // Functions
 
   const showDeleteConfirmDialog = (postId) => {
     confirmDialog({
@@ -75,16 +85,14 @@ const Posts = () => {
           <span>There are no posts at the moment.</span>
         </div>
       ) : (
-        posts
-          .sort((a, b) => b.data.time - a.data.time)
-          .map((post) => (
-            <Post
-              key={post.id}
-              post={post}
-              setPosts={setPosts}
-              showDeleteConfirmDialog={showDeleteConfirmDialog}
-            />
-          ))
+        posts.map((post) => (
+          <Post
+            key={post.id}
+            post={post}
+            setPosts={setPosts}
+            showDeleteConfirmDialog={showDeleteConfirmDialog}
+          />
+        ))
       )}
     </div>
   );

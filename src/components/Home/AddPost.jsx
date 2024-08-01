@@ -1,8 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../contexts/authContext";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { getCurrentUserData } from "../../firebase/auth";
 
 // components
 import { Button } from "primereact/button";
@@ -20,15 +21,35 @@ const AddPost = ({ setPosts }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [postDialogVisible, setPostDialogVisible] = useState(false);
   const fileUploadRef = useRef(null);
+  const [cUser, setUser] = useState(null);
+
+  // Get current user data
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const userData = await getCurrentUserData();
+      setUser(userData);
+    };
+
+    fetchUserData();
+  }, []); // Empty dependency array ensures this runs only once after the initial render
+
+  // Watch cUser changes
+  useEffect(() => {
+    if (cUser) {
+      // console.log("Current user data:", cUser);
+    }
+  }, [cUser]); // This effect runs whenever cUser changes
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setIsLoading(true);
 
     let imageURL = "";
 
     if (img) {
-      const imageRef = ref(storage, `postImages/${Date.now()}_${img.name}`);
+      const imageRef = ref(storage, `post-images/${Date.now()}_${img.name}`);
+
       try {
         await uploadBytes(imageRef, img);
         imageURL = await getDownloadURL(imageRef);
@@ -38,23 +59,25 @@ const AddPost = ({ setPosts }) => {
     }
 
     const postData = {
-      uid: currentUser.uid,
       author: {
         uid: currentUser.uid,
-        name: currentUser.displayName,
+        name: cUser.name,
         email: currentUser.email,
-        image: currentUser.photoURL,
-        role: "User",
+        image: cUser.image,
+        role: cUser.role,
       },
       title: postTitle,
       description: postDescription,
       image: imageURL,
-      time: serverTimestamp(),
+      timestamp: serverTimestamp(), // Ensure timestamp is set correctly
     };
+
+    console.log("post data:", postData);
 
     try {
       const docRef = await addDoc(collection(db, "posts"), postData);
-      setPosts((prevPosts) => [{ ...postData, id: docRef.id }, ...prevPosts]);
+      const newPost = { ...postData, id: docRef.id, timestamp: new Date() };
+      setPosts((prevPosts) => [newPost, ...prevPosts]);
       setPostTitle("");
       setPostDescription("");
       setPostImage(null);
@@ -113,9 +136,9 @@ const AddPost = ({ setPosts }) => {
           </div>
 
           <div className="flex flex-column gap-2 mb-5">
-            <label htmlFor="post-paragraph">Post Paragraph</label>
+            <label htmlFor="post-description">Post Description</label>
             <InputTextarea
-              id="post-paragraph"
+              id="post-description"
               value={postDescription}
               onChange={(e) => setPostDescription(e.target.value)}
               rows={3}

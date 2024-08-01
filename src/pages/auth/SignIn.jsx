@@ -1,17 +1,13 @@
 import React, { useState } from "react";
 import { Navigate, Link } from "react-router-dom";
 
-import {
-  doSignInWithEmailAndPassword,
-  doSignInWithGoogle,
-} from "../../firebase/auth";
+import { doSignInWithEmailAndPassword } from "../../firebase/auth";
 import { useAuth } from "../../contexts/authContext";
 
 // components
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
 import { Button } from "primereact/button";
-import { Divider } from "primereact/divider";
 
 function SignIn() {
   const { userLoggedIn } = useAuth();
@@ -29,22 +25,6 @@ function SignIn() {
     if (!isSigningIn) {
       setIsSigningIn(true);
       await doSignInWithEmailAndPassword(email, password)
-        .then(() => {
-          // navigate to home
-          Navigate("/");
-        })
-        .catch(() => {
-          setIsSigningIn(false);
-        });
-    }
-  };
-
-  const googleSignIn = (e) => {
-    e.preventDefault();
-
-    if (!isSigningIn) {
-      setIsSigningIn(true);
-      doSignInWithGoogle()
         .then(() => {
           // navigate to home
           Navigate("/");
@@ -107,22 +87,6 @@ function SignIn() {
             Back To Home
           </Link>
         </div>
-
-        <Divider align="center" className="mt-0 mb-5">
-          <p className="my-0">OR</p>
-        </Divider>
-
-        <Button
-          className="w-full"
-          icon="pi pi-google"
-          label={isSigningIn ? "Signing In..." : "Sign In with Google"}
-          severity="secondary"
-          outlined
-          disabled={isSigningIn}
-          onClick={(e) => {
-            googleSignIn(e);
-          }}
-        />
       </div>
     </div>
   );

@@ -68,22 +68,22 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
       <div className="post-head mb-3 flex-between-center">
         <div className="flex-start-center gap-3">
           <img
-            src={post.data.author?.image}
-            alt={post.data.author?.name}
+            src={post.data?.author.image}
+            alt={post.data?.author.name}
             className="w-3rem border-circle"
           />
 
           <div className="flex flex-column gap-2">
             <span className="font-semibold text-gray-700">
-              {post.data.author?.name}
+              {post.data?.author.name}
             </span>
             <span className="text-sm font-medium text-gray-500">
-              {post.data.author?.role}
+              {post.data?.author.role}
             </span>
           </div>
         </div>
 
-        {currentUser?.uid === post.data.uid && (
+        {currentUser.uid === post.data?.author.uid && (
           <>
             <Button
               icon="pi pi-ellipsis-v"
@@ -106,11 +106,13 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
         )}
       </div>
 
-      <div
-        className="post-image mb-3 h-20rem bg-no-repeat bg-cover bg-center border-round-xl"
-        style={{
-          backgroundImage: `url(${post.data.image})`,
-        }}></div>
+      {post.data?.image && (
+        <div
+          className="post-image mb-3 h-20rem bg-no-repeat bg-cover bg-center border-round-xl"
+          style={{
+            backgroundImage: `url(${post.data.image})`,
+          }}></div>
+      )}
 
       <div className="post-statistics mb-3 flex-between-center px-3">
         <div className="flex-start-center gap-3">
@@ -126,13 +128,13 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
         </div>
 
         <span className="text-sm font-medium text-gray-500">
-          {new Date(post.data?.time?.toDate()).toLocaleString()}
+          {new Date(post.data?.timestamp?.toDate()).toLocaleString()}
         </span>
       </div>
 
       <div className="post-content flex flex-column gap-2 px-3">
-        <span className="font-semibold text-gray-700">{post.data.title}</span>
-        <span className="text-sm text-gray-500">{post.data.description}</span>
+        <span className="font-semibold text-gray-700">{post.data?.title}</span>
+        <span className="text-sm text-gray-500">{post.data?.description}</span>
       </div>
     </div>
   );
