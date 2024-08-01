@@ -83,7 +83,7 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
           </div>
         </div>
 
-        {currentUser.uid === post.data?.author.uid && (
+        {currentUser?.uid === post.data?.author.uid && (
           <>
             <Button
               icon="pi pi-ellipsis-v"
