@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { collection, onSnapshot } from "firebase/firestore";
-import { db } from "../../firebase/firebase";
+import { db, storage } from "../../firebase/firebase";
 import { doc, setDoc, deleteDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useAuth } from "../../contexts/authContext";
 
 // components
@@ -10,6 +11,7 @@ import { Menu } from "primereact/menu";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
+import { FileUpload } from "primereact/fileupload";
 
 const Post = ({ post, showDeleteConfirmDialog }) => {
   const { currentUser } = useAuth();
@@ -21,6 +23,8 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
   const [editDescription, setEditDescription] = useState(
     post.data?.description
   );
+  const [editImage, setEditImage] = useState(null);
+  const fileUploadRef = useRef(null);
 
   useEffect(() => {
     const unSub = onSnapshot(
@@ -70,6 +74,21 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
+
+    let imageURL = post.data?.image;
+    if (editImage) {
+      const imageRef = ref(
+        storage,
+        `post-images/${Date.now()}_${editImage.name}`
+      );
+      try {
+        await uploadBytes(imageRef, editImage);
+        imageURL = await getDownloadURL(imageRef);
+      } catch (error) {
+        console.error("Error uploading image:", error);
+      }
+    }
+
     try {
       const postRef = doc(db, "posts", post.id);
       await setDoc(
@@ -78,6 +97,7 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
           ...post.data,
           title: editTitle,
           description: editDescription,
+          image: imageURL,
         },
         { merge: true }
       );
@@ -85,6 +105,34 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
     } catch (error) {
       console.error("Error updating post:", error);
     }
+  };
+
+  const headerTemplate = (options) => {
+    const { className, chooseButton, cancelButton } = options;
+
+    return (
+      <div
+        className={className}
+        style={{
+          backgroundColor: "transparent",
+          display: "flex",
+          alignItems: "center",
+        }}>
+        {chooseButton}
+        {cancelButton}
+      </div>
+    );
+  };
+
+  const itemTemplate = (file) => {
+    return (
+      <img
+        alt={file.name}
+        role="presentation"
+        src={file.objectURL}
+        width={200}
+      />
+    );
   };
 
   return (
@@ -166,13 +214,29 @@ const Post = ({ post, showDeleteConfirmDialog }) => {
             />
           </div>
 
-          <div className="flex flex-column gap-2 mb-5">
+          <div className="flex flex-column gap-2 mb-3">
             <label htmlFor="post-description">Post Description</label>
             <InputTextarea
               id="post-description"
               value={editDescription}
               onChange={(e) => setEditDescription(e.target.value)}
               rows={3}
+            />
+          </div>
+
+          <div className="flex flex-column gap-2 mb-5">
+            <label>Post Image</label>
+            <FileUpload
+              ref={fileUploadRef}
+              headerTemplate={headerTemplate}
+              itemTemplate={itemTemplate}
+              name="edit[]"
+              accept="image/*"
+              maxFileSize={1000000}
+              emptyTemplate={<p className="m-0">Drag and drop image here.</p>}
+              onSelect={(e) => {
+                setEditImage(e.files[0]);
+              }}
             />
           </div>
 
