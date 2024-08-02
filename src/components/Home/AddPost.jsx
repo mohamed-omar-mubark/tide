@@ -4,6 +4,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../../firebase/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getCurrentUserData } from "../../firebase/auth";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 // components
 import { Button } from "primereact/button";
@@ -14,9 +16,6 @@ import { FileUpload } from "primereact/fileupload";
 
 const AddPost = ({ setPosts }) => {
   const { currentUser } = useAuth();
-
-  const [postTitle, setPostTitle] = useState("");
-  const [postDescription, setPostDescription] = useState("");
   const [img, setPostImage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [postDialogVisible, setPostDialogVisible] = useState(false);
@@ -31,20 +30,28 @@ const AddPost = ({ setPosts }) => {
     };
 
     fetchUserData();
-  }, []); // Empty dependency array ensures this runs only once after the initial render
+  }, []);
 
   // Watch cUser changes
   useEffect(() => {
     if (cUser) {
       // console.log("Current user data:", cUser);
     }
-  }, [cUser]); // This effect runs whenever cUser changes
+  }, [cUser]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Yup validation schema
+  const validationSchema = Yup.object({
+    postTitle: Yup.string().required("Post Title is required"),
+    postDescription: Yup.string().required("Post Description is required"),
+  });
 
+  const initialValues = {
+    postTitle: "",
+    postDescription: "",
+  };
+
+  const handleSubmit = async (values, { setSubmitting }) => {
     setIsLoading(true);
-
     let imageURL = "";
 
     if (img) {
@@ -66,8 +73,8 @@ const AddPost = ({ setPosts }) => {
         image: cUser.image,
         role: cUser.role,
       },
-      title: postTitle,
-      description: postDescription,
+      title: values.postTitle,
+      description: values.postDescription,
       image: imageURL,
       timestamp: serverTimestamp(), // Ensure timestamp is set correctly
     };
@@ -78,8 +85,6 @@ const AddPost = ({ setPosts }) => {
       const docRef = await addDoc(collection(db, "posts"), postData);
       const newPost = { ...postData, id: docRef.id, timestamp: new Date() };
       setPosts((prevPosts) => [newPost, ...prevPosts]);
-      setPostTitle("");
-      setPostDescription("");
       setPostImage(null);
       fileUploadRef.current.clear();
       setPostDialogVisible(false);
@@ -87,6 +92,7 @@ const AddPost = ({ setPosts }) => {
       console.error("Error adding post:", error);
     } finally {
       setIsLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -125,57 +131,72 @@ const AddPost = ({ setPosts }) => {
         visible={postDialogVisible}
         style={{ width: "100%", maxWidth: "500px" }}
         onHide={() => setPostDialogVisible(false)}>
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-column gap-2 mb-3">
-            <label htmlFor="post-title">Post Title</label>
-            <InputText
-              id="post-title"
-              value={postTitle}
-              onChange={(e) => setPostTitle(e.target.value)}
-            />
-          </div>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}>
+          {({ isSubmitting }) => (
+            <Form>
+              <div className="flex flex-column gap-2 mb-3">
+                <label htmlFor="post-title">Post Title</label>
+                <Field as={InputText} id="post-title" name="postTitle" />
+                <ErrorMessage
+                  name="postTitle"
+                  component="div"
+                  className="text-sm font-medium text-red-500"
+                />
+              </div>
 
-          <div className="flex flex-column gap-2 mb-5">
-            <label htmlFor="post-description">Post Description</label>
-            <InputTextarea
-              id="post-description"
-              value={postDescription}
-              onChange={(e) => setPostDescription(e.target.value)}
-              rows={3}
-            />
-          </div>
+              <div className="flex flex-column gap-2 mb-5">
+                <label htmlFor="post-description">Post Description</label>
+                <Field
+                  as={InputTextarea}
+                  id="post-description"
+                  name="postDescription"
+                  rows={3}
+                />
+                <ErrorMessage
+                  name="postDescription"
+                  component="div"
+                  className="text-sm font-medium text-red-500"
+                />
+              </div>
 
-          <div className="flex flex-column gap-2 mb-5">
-            <label>Post Image</label>
-            <FileUpload
-              ref={fileUploadRef}
-              headerTemplate={headerTemplate}
-              itemTemplate={itemTemplate}
-              name="demo[]"
-              accept="image/*"
-              maxFileSize={1000000}
-              emptyTemplate={<p className="m-0">Drag and drop image here.</p>}
-              onSelect={(e) => {
-                setPostImage(e.files[0]);
-              }}
-            />
-          </div>
+              <div className="flex flex-column gap-2 mb-5">
+                <label>Post Image</label>
+                <FileUpload
+                  ref={fileUploadRef}
+                  headerTemplate={headerTemplate}
+                  itemTemplate={itemTemplate}
+                  name="demo[]"
+                  accept="image/*"
+                  maxFileSize={1000000}
+                  emptyTemplate={
+                    <p className="m-0">Drag and drop image here.</p>
+                  }
+                  onSelect={(e) => {
+                    setPostImage(e.files[0]);
+                  }}
+                />
+              </div>
 
-          <div className="flex justify-content-end align-items-center gap-3">
-            <Button
-              label="Cancel"
-              type="button"
-              size="small"
-              onClick={() => setPostDialogVisible(false)}
-            />
-            <Button
-              label={isLoading ? "loading..." : "Add"}
-              type="submit"
-              size="small"
-              disabled={isLoading}
-            />
-          </div>
-        </form>
+              <div className="flex justify-content-end align-items-center gap-3">
+                <Button
+                  label="Cancel"
+                  type="button"
+                  size="small"
+                  onClick={() => setPostDialogVisible(false)}
+                />
+                <Button
+                  label={isSubmitting || isLoading ? "loading..." : "Add"}
+                  type="submit"
+                  size="small"
+                  disabled={isSubmitting || isLoading}
+                />
+              </div>
+            </Form>
+          )}
+        </Formik>
       </Dialog>
 
       {currentUser && (
